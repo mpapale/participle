@@ -27,17 +27,16 @@ func TestErrorReporting(t *testing.T) {
 	type grammar struct {
 		Decls []*decl `( @@ ";" )*`
 	}
-	p := mustTestParser(t, &grammar{}, participle.UseLookahead(5))
+	p := mustTestParser[grammar](t, participle.UseLookahead(5))
 
 	var err error
-	ast := &grammar{}
-	err = p.ParseString("", `public class A;`, ast)
+	_, err = p.ParseString("", `public class A;`)
 	assert.NoError(t, err)
-	err = p.ParseString("", `public union A;`, ast)
+	_, err = p.ParseString("", `public union A;`)
 	assert.NoError(t, err)
-	err = p.ParseString("", `public struct Bar;`, ast)
+	_, err = p.ParseString("", `public struct Bar;`)
 	assert.EqualError(t, err, `1:8: unexpected token "struct" (expected "union" <ident>)`)
-	err = p.ParseString("", `public class 1;`, ast)
+	_, err = p.ParseString("", `public class 1;`)
 	assert.EqualError(t, err, `1:14: unexpected token "1" (expected <ident>)`)
 }
 
